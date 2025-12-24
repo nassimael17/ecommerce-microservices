@@ -1,0 +1,60 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ecommerce
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - ecommerce-net
+
+  config-server:
+    build: ./config-server/config-server
+    ports:
+      - "8888:8888"
+
+    volumes:
+      - ./config-repo:/app/config-repo   # ✅ Mount host repo into container
+    environment:
+      SPRING_PROFILES_ACTIVE: native
+      SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCH_LOCATIONS: file:/app/config-repo
+
+    networks:
+      - ecommerce-net
+
+  eureka-server:
+    build: ./eureka-server/eureka-server
+    ports:
+      - "8761:8761"
+    depends_on:
+      - config-server
+    networks:
+      - ecommerce-net
+
+  api-gateway:
+    build: ./api-gateway/api-gateway
+    ports:
+      - "8085:8080"
+    depends_on:
+      - eureka-server
+    networks:
+      - ecommerce-net
+
+  product-service:
+    build: ./product-service/product-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+      - eureka-server
+      - config-server
+    networks:
+      - ecommerce-net
+    command: ["bash", "-c", "sleep 15 && java -jar /app/app.jar"]
+
+networks:
+  ecommerce-net:
+    driver: bridge
