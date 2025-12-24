@@ -70,6 +70,30 @@ services:
       - ecommerce-net
     command: ["bash", "-c", "sleep 15 && java -jar /app/app.jar"]
 
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - ecommerce-net
+
+
+  notification-service:
+    build: ./notification-service/notification-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      - rabbitmq
+      - eureka-server
+      - config-server
+    networks:
+      - ecommerce-net
+    command: ["bash", "-c", "sleep 20 && java -jar /app/app.jar"]
+
+
 networks:
   ecommerce-net:
     driver: bridge

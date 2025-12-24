@@ -27,6 +27,14 @@ spring:
 
           filters:
             - PreserveHostHeader=true
+
+        - id: notification-service
+          uri: lb://notification-service
+          predicates:
+            - Path=/api/notifications/**
+          filters:
+            - PreserveHostHeader=true
+
   config:
     import: optional:configserver:http://config-server:8888
 
