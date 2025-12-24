@@ -17,6 +17,16 @@ spring:
           uri: lb://product-service
           predicates:
             - Path=/api/products/**
+          filters:
+            - PreserveHostHeader=true
+
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/api/orders/**
+
+          filters:
+            - PreserveHostHeader=true
   config:
     import: optional:configserver:http://config-server:8888
 
@@ -28,3 +38,8 @@ eureka:
       defaultZone: http://eureka-server:8761/eureka/
   instance:
     prefer-ip-address: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

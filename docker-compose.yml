@@ -25,6 +25,21 @@ services:
     networks:
       - ecommerce-net
 
+
+  order-service:
+    build: ./order-service/order-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - config-server
+      - eureka-server
+      - postgres
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    command: ["bash", "-c", "sleep 10 && java -jar /app/app.jar"]
+    networks:
+      - ecommerce-net
+
   eureka-server:
     build: ./eureka-server/eureka-server
     ports:
