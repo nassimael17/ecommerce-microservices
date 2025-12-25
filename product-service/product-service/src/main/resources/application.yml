@@ -3,24 +3,31 @@ server:
 
 spring:
   application:
-    name: product-service
-  config:
-    import: optional:configserver:http://config-server:8888
+    name: PRODUCT-SERVICE
   datasource:
     url: jdbc:postgresql://postgres:5432/ecommerce
     username: postgres
     password: postgres
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  config:
+    import: optional:configserver:http://config-server:8888
 
 eureka:
   client:
     serviceUrl:
       defaultZone: http://eureka-server:8761/eureka/
   instance:
-    prefer-ip-address: true
+    preferIpAddress: true
+    hostname: product-service
+    nonSecurePort: 8081
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

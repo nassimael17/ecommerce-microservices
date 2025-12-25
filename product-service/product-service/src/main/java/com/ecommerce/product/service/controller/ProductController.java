@@ -2,6 +2,8 @@ package com.ecommerce.product.service.controller;
 
 import com.ecommerce.product.service.model.Product;
 import com.ecommerce.product.service.service.ProductService;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -21,9 +23,12 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public Product getProductById(@PathVariable Long id) {
-        return productService.getProductById(id).orElse(null);
+    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+        return productService.getProductById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
+
 
     @PostMapping
     public Product createProduct(@RequestBody Product product) {

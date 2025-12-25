@@ -1,10 +1,9 @@
 package com.ecommerce.notification.service.config;
 
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,14 +11,24 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 
 @Configuration
-@EnableRabbit
 public class RabbitMQConfig {
 
-    public static final String NOTIFICATION_QUEUE = "notificationQueue";
+    public static final String EXCHANGE_NAME = "notificationExchange";
+    public static final String QUEUE_NAME = "notificationQueue";
 
     @Bean
     public Queue notificationQueue() {
-        return new Queue(NOTIFICATION_QUEUE, true);
+        return new Queue(QUEUE_NAME, true);
+    }
+
+    @Bean
+    public DirectExchange notificationExchange() {
+        return new DirectExchange(EXCHANGE_NAME);
+    }
+
+    @Bean
+    public Binding binding(Queue notificationQueue, DirectExchange notificationExchange) {
+        return BindingBuilder.bind(notificationQueue).to(notificationExchange).with(QUEUE_NAME);
     }
 
     @Bean
@@ -29,13 +38,11 @@ public class RabbitMQConfig {
         return admin;
     }
 
-    // ✅ Add JSON converter for message serialization/deserialization
     @Bean
     public Jackson2JsonMessageConverter jackson2JsonMessageConverter() {
         return new Jackson2JsonMessageConverter();
     }
 
-    // ✅ Make all RabbitListeners use the JSON converter
     @Bean
     public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(
             ConnectionFactory connectionFactory,
@@ -49,7 +56,9 @@ public class RabbitMQConfig {
     @EventListener(ApplicationReadyEvent.class)
     public void declareQueueWhenReady(ApplicationReadyEvent event) {
         RabbitAdmin admin = event.getApplicationContext().getBean(RabbitAdmin.class);
+        admin.declareExchange(notificationExchange());
         admin.declareQueue(notificationQueue());
-        System.out.println("✅ Declared queue after app ready: " + NOTIFICATION_QUEUE);
+        admin.declareBinding(binding(notificationQueue(), notificationExchange()));
+        System.out.println("✅ Declared queue, exchange, and binding after app ready.");
     }
 }

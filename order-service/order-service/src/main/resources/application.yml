@@ -2,6 +2,8 @@ server:
   port: 8082
 
 spring:
+  main:
+    lazy-initialization: true
   cloud:
     openfeign:
       discovery:
@@ -38,6 +40,8 @@ eureka:
       defaultZone: http://eureka-server:8761/eureka/
   instance:
     preferIpAddress: true
+    hostname: order-service
+    nonSecurePort: 8082
 
 feign:
   client:
@@ -65,3 +69,11 @@ logging:
   level:
     com.ecommerce.order.service.client.ProductClient: DEBUG
     org.springframework.cloud.openfeign: DEBUG
+    feign: DEBUG
+    io.github.resilience4j: DEBUG
+
+  resilience4j.retry:
+  instances:
+    productService:
+      maxAttempts: 5
+      waitDuration: 2s
