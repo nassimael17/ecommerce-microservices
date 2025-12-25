@@ -46,6 +46,7 @@ eureka:
       defaultZone: http://eureka-server:8761/eureka/
   instance:
     prefer-ip-address: true
+    hostname: ${spring.application.name}
 management:
   endpoints:
     web:

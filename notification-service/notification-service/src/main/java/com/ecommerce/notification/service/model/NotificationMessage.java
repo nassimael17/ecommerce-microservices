@@ -4,11 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class NotificationMessage {
-    private String recipientEmail;
+    private List<String> recipientEmails;
     private String recipientPhone;
     private String message;
 }

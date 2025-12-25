@@ -27,6 +27,14 @@ spring:
 
           filters:
             - PreserveHostHeader=true
+
+        - id: notification-service
+          uri: lb://notification-service
+          predicates:
+            - Path=/api/notifications/**
+          filters:
+            - PreserveHostHeader=true
+
   config:
     import: optional:configserver:http://config-server:8888
 
@@ -38,6 +46,7 @@ eureka:
       defaultZone: http://eureka-server:8761/eureka/
   instance:
     prefer-ip-address: true
+    hostname: ${spring.application.name}
 management:
   endpoints:
     web:
