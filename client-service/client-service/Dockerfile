@@ -1,4 +1,13 @@
-FROM openjdk:17-jdk-slim
-VOLUME /tmp
-COPY target/*.jar app.jar
-ENTRYPOINT ["java","-jar","/app.jar"]
+# ---- BUILD STAGE ----
+FROM maven:3.9.9-eclipse-temurin-17 AS builder
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn -q -DskipTests package
+
+# ---- RUNTIME STAGE ----
+FROM eclipse-temurin:17-jdk-jammy
+WORKDIR /app
+COPY --from=builder /app/target/*.jar app.jar
+EXPOSE 8084
+ENTRYPOINT ["java","-jar","/app/app.jar"]

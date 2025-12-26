@@ -4,14 +4,17 @@ server:
 spring:
   application:
     name: api-gateway
+
   cloud:
     compatibility-verifier:
       enabled: false
+
     gateway:
       discovery:
         locator:
           enabled: true
           lower-case-service-id: true
+
       routes:
         - id: product-service
           uri: lb://product-service
@@ -24,7 +27,27 @@ spring:
           uri: lb://order-service
           predicates:
             - Path=/api/orders/**
+          filters:
+            - PreserveHostHeader=true
 
+        - id: client-service
+          uri: lb://client-service
+          predicates:
+            - Path=/api/clients/**
+          filters:
+            - PreserveHostHeader=true
+
+        - id: payment-service
+          uri: lb://payment-service
+          predicates:
+            - Path=/api/payments/**
+          filters:
+            - PreserveHostHeader=true
+
+        - id: batch-service
+          uri: lb://batch-service
+          predicates:
+            - Path=/api/batch/**
           filters:
             - PreserveHostHeader=true
 
@@ -34,6 +57,14 @@ spring:
             - Path=/api/notifications/**
           filters:
             - PreserveHostHeader=true
+
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
 
   config:
     import: optional:configserver:http://config-server:8888
@@ -46,7 +77,7 @@ eureka:
       defaultZone: http://eureka-server:8761/eureka/
   instance:
     prefer-ip-address: true
-    hostname: ${spring.application.name}
+
 management:
   endpoints:
     web:

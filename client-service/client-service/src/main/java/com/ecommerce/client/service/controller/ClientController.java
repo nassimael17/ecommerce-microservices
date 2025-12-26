@@ -1,0 +1,58 @@
+package com.ecommerce.client.service.controller;
+
+import com.ecommerce.client.service.dto.ClientRequest;
+import com.ecommerce.client.service.model.Client;
+import com.ecommerce.client.service.repository.ClientRepository;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.Instant;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/clients")
+public class ClientController {
+
+  private final ClientRepository repo;
+
+  public ClientController(ClientRepository repo) {
+    this.repo = repo;
+  }
+
+  @GetMapping
+  public List<Client> all() { return repo.findAll(); }
+
+  @GetMapping("/{id}")
+  public Client one(@PathVariable Long id) {
+    return repo.findById(id).orElseThrow(() -> new RuntimeException("Client not found"));
+  }
+
+  @PostMapping
+  @ResponseStatus(HttpStatus.CREATED)
+  public Client create(@Valid @RequestBody ClientRequest req) {
+    if (repo.existsByEmail(req.email())) throw new RuntimeException("Email already exists");
+    Client c = Client.builder()
+      .fullName(req.fullName())
+      .email(req.email())
+      .phone(req.phone())
+      .address(req.address())
+      .createdAt(Instant.now())
+      .build();
+    return repo.save(c);
+  }
+
+  @PutMapping("/{id}")
+  public Client update(@PathVariable Long id, @Valid @RequestBody ClientRequest req) {
+    Client c = repo.findById(id).orElseThrow(() -> new RuntimeException("Client not found"));
+    c.setFullName(req.fullName());
+    c.setPhone(req.phone());
+    c.setAddress(req.address());
+    return repo.save(c);
+  }
+
+  @DeleteMapping("/{id}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void delete(@PathVariable Long id) { repo.deleteById(id); }
+}
+
