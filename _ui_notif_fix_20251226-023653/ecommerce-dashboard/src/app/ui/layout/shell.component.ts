@@ -38,11 +38,6 @@ import { MatButtonModule } from '@angular/material/button';
           <span style="margin-left:8px;">Commandes</span>
         </a>
 
-        <a mat-list-item routerLink="/app/payments" routerLinkActive="active">
-          <mat-icon>payments</mat-icon>
-          <span style="margin-left:8px;">Paiements</span>
-        </a>
-
         <a mat-list-item routerLink="/app/clients" routerLinkActive="active">
           <mat-icon>group</mat-icon>
           <span style="margin-left:8px;">Clients</span>

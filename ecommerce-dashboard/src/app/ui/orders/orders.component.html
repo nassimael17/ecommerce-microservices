@@ -1,0 +1,31 @@
+<h2>Commandes</h2>
+
+<div class="form">
+  <select [(ngModel)]="clientId">
+    <option [ngValue]="null">-- Client --</option>
+    <option *ngFor="let c of clients" [value]="c.id">
+      {{ c.fullName }} ({{ c.email }})
+    </option>
+  </select>
+
+  <select [(ngModel)]="productId">
+    <option [ngValue]="null">-- Produit --</option>
+    <option *ngFor="let p of products" [value]="p.id">
+      {{ p.name }} - {{ p.price }} MAD
+    </option>
+  </select>
+
+  <input type="number" [(ngModel)]="quantity" min="1">
+
+  <button (click)="createOrder()">Créer</button>
+</div>
+
+<hr>
+
+<p *ngIf="orders.length === 0">Aucune commande.</p>
+
+<ul>
+  <li *ngFor="let o of orders">
+    Commande #{{ o.id }} — Client {{ o.clientId }} — Produit {{ o.productId }} — Qté {{ o.quantity }}
+  </li>
+</ul>

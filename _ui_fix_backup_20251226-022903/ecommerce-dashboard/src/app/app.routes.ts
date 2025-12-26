@@ -19,8 +19,6 @@ export const routes: Routes = [
     component: ShellComponent,
     canActivate: [authGuard],
     children: [
-      { path: 'payments', loadComponent: () => import('./ui/payments/payments.component').then(m => m.PaymentsComponent) },
-
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       { path: 'dashboard', component: DashboardComponent },
       { path: 'products', component: ProductsComponent },

@@ -1,15 +1,26 @@
 package com.ecommerce.notification.service.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import java.util.List;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class NotificationMessage {
-    private List<String> recipientEmails;
-    private String recipientPhone;
-    private String message;
+  private List<String> to;
+  private String phone;
+  private String message;
+
+  public NotificationMessage() {}
+
+  public NotificationMessage(List<String> to, String phone, String message) {
+    this.to = to;
+    this.phone = phone;
+    this.message = message;
+  }
+
+  public List<String> getTo() { return to; }
+  public void setTo(List<String> to) { this.to = to; }
+
+  public String getPhone() { return phone; }
+  public void setPhone(String phone) { this.phone = phone; }
+
+  public String getMessage() { return message; }
+  public void setMessage(String message) { this.message = message; }
 }

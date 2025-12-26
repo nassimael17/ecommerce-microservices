@@ -1,0 +1,26 @@
+/home/mehdi-ajana/Java-Project/ecommerce-microservices/ecommerce-dashboard/src/app/app.routes.ts:8:import { OrdersComponent } from './ui/orders/orders.component';
+/home/mehdi-ajana/Java-Project/ecommerce-microservices/ecommerce-dashboard/src/app/app.routes.ts:27:      { path: 'orders', component: OrdersComponent },
+/home/mehdi-ajana/Java-Project/ecommerce-microservices/ecommerce-dashboard/src/app/api/api.models.ts:16:export type OrderStatus = 'CREATED' | 'PAID' | 'SHIPPED' | 'CANCELLED';
+/home/mehdi-ajana/Java-Project/ecommerce-microservices/ecommerce-dashboard/src/app/api/api.models.ts:18:export interface Order {
+/home/mehdi-ajana/Java-Project/ecommerce-microservices/ecommerce-dashboard/src/app/api/api.models.ts:23:  status?: OrderStatus;
+/home/mehdi-ajana/Java-Project/ecommerce-microservices/ecommerce-dashboard/src/app/api/payments.api.ts:17:  byOrder(orderId: number) {
+/home/mehdi-ajana/Java-Project/ecommerce-microservices/ecommerce-dashboard/src/app/api/orders.api.ts:3:import { Order } from './api.models';
+/home/mehdi-ajana/Java-Project/ecommerce-microservices/ecommerce-dashboard/src/app/api/orders.api.ts:6:export class OrdersApi {
+/home/mehdi-ajana/Java-Project/ecommerce-microservices/ecommerce-dashboard/src/app/api/orders.api.ts:11:  list() { return this.http.get<Order[]>(this.base); }
+/home/mehdi-ajana/Java-Project/ecommerce-microservices/ecommerce-dashboard/src/app/api/orders.api.ts:18:    return this.http.post<Order>(this.base, null, { params });
+/home/mehdi-ajana/Java-Project/ecommerce-microservices/ecommerce-dashboard/src/app/ui/orders/orders.component.ts:5:import { OrdersApi } from '../../api/orders.api';
+/home/mehdi-ajana/Java-Project/ecommerce-microservices/ecommerce-dashboard/src/app/ui/orders/orders.component.ts:9:import { Order, Client, Product } from '../../api/api.models';
+/home/mehdi-ajana/Java-Project/ecommerce-microservices/ecommerce-dashboard/src/app/ui/orders/orders.component.ts:64:          <div style="font-weight:600;">Order #{{ o.id ?? '—' }}</div>
+/home/mehdi-ajana/Java-Project/ecommerce-microservices/ecommerce-dashboard/src/app/ui/orders/orders.component.ts:67:            total={{ o.totalPrice ?? '—' }}
+/home/mehdi-ajana/Java-Project/ecommerce-microservices/ecommerce-dashboard/src/app/ui/orders/orders.component.ts:76:export class OrdersComponent {
+/home/mehdi-ajana/Java-Project/ecommerce-microservices/ecommerce-dashboard/src/app/ui/orders/orders.component.ts:77:  items = signal<Order[]>([]);
+/home/mehdi-ajana/Java-Project/ecommerce-microservices/ecommerce-dashboard/src/app/ui/orders/orders.component.ts:87:    private ordersApi: OrdersApi,
+/home/mehdi-ajana/Java-Project/ecommerce-microservices/ecommerce-dashboard/src/app/ui/orders/orders.component.ts:95:    this.loadOrders();
+/home/mehdi-ajana/Java-Project/ecommerce-microservices/ecommerce-dashboard/src/app/ui/orders/orders.component.ts:100:  loadOrders() {
+/home/mehdi-ajana/Java-Project/ecommerce-microservices/ecommerce-dashboard/src/app/ui/orders/orders.component.ts:125:      next: () => this.loadOrders(),
+/home/mehdi-ajana/Java-Project/ecommerce-microservices/ecommerce-dashboard/src/app/ui/orders/orders.component.ts:133:  remove(o: Order) {
+/home/mehdi-ajana/Java-Project/ecommerce-microservices/ecommerce-dashboard/src/app/ui/orders/orders.component.ts:135:    this.ordersApi.delete(o.id).subscribe({ next: () => this.loadOrders() });
+/home/mehdi-ajana/Java-Project/ecommerce-microservices/ecommerce-dashboard/src/app/ui/orders/orders.component.html:20:  <button (click)="createOrder()">Créer</button>
+/home/mehdi-ajana/Java-Project/ecommerce-microservices/ecommerce-dashboard/src/app/ui/dashboard/dashboard.component.ts:4:import { OrdersApi } from '../../api/orders.api';
+/home/mehdi-ajana/Java-Project/ecommerce-microservices/ecommerce-dashboard/src/app/ui/dashboard/dashboard.component.ts:43:  constructor(products: ProductsApi, orders: OrdersApi, clients: ClientsApi) {
+/home/mehdi-ajana/Java-Project/ecommerce-microservices/ecommerce-dashboard/src/app/ui/payments/payments.component.ts:23:        <mat-label>Order ID</mat-label>

@@ -30,12 +30,3 @@ export interface NotificationMessage {
   text?: string;
   createdAt?: string;
 }
-
-export interface Payment {
-  id?: number;
-  orderId: number;
-  amount: number;
-  method: string;   // CARD/CASH/...
-  status?: string;  // PAID/FAILED/...
-  createdAt?: string;
-}
