@@ -1,6 +1,0 @@
------ FILE: ecommerce-dashboard/src/app/api/api.models.ts | PATTERN: export (interface|type|class) Order|totalPrice|total|price -----
-
------ FILE: ecommerce-dashboard/src/app/api/orders.api.ts | PATTERN: Order|totalPrice|total|price -----
-
------ FILE: ecommerce-dashboard/src/app/ui/orders/orders.component.ts | PATTERN: totalPrice|Order|orders -----
-

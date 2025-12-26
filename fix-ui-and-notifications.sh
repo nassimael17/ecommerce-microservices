@@ -91,7 +91,7 @@ export interface Payment {
 else:
     print("ℹ️ Payment model already exists")
 PY
-
+ 
 
 # Write payments.api.ts
 mkdir -p "$(dirname "$PAYMENTS_API")"

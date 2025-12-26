@@ -3,11 +3,12 @@ package com.ecommerce.notification.service.config;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 
 @Configuration
@@ -46,19 +47,27 @@ public class RabbitMQConfig {
     @Bean
     public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(
             ConnectionFactory connectionFactory,
-            Jackson2JsonMessageConverter converter) {
+            Jackson2JsonMessageConverter converter
+    ) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
         factory.setMessageConverter(converter);
         return factory;
     }
 
+    @Bean
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory,
+                                        Jackson2JsonMessageConverter converter) {
+        RabbitTemplate t = new RabbitTemplate(connectionFactory);
+        t.setMessageConverter(converter);
+        return t;
+    }
+
     @EventListener(ApplicationReadyEvent.class)
     public void declareQueueWhenReady(ApplicationReadyEvent event) {
         RabbitAdmin admin = event.getApplicationContext().getBean(RabbitAdmin.class);
-        admin.declareExchange(notificationExchange());
         admin.declareQueue(notificationQueue());
+        admin.declareExchange(notificationExchange());
         admin.declareBinding(binding(notificationQueue(), notificationExchange()));
-        System.out.println("✅ Declared queue, exchange, and binding after app ready.");
     }
 }

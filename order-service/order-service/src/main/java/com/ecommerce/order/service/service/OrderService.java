@@ -52,6 +52,7 @@ public class OrderService {
             NotificationMessage notification = new NotificationMessage(
                     List.of("ajanamehdi751@gmail.com"),
                     "+212660553886",
+                    "Order notification",
                     "📦 Your order #" + savedOrder.getId() + " has been created successfully!"
             );
 
@@ -86,6 +87,7 @@ public class OrderService {
             NotificationMessage notification = new NotificationMessage(
                     List.of("ajanamehdi751@gmail.com"),
                     "+212660553886",
+                    "Order notification",
                     "⚠️ Order #" + savedOrder.getId() + " failed to process (Fallback triggered)."
             );
 

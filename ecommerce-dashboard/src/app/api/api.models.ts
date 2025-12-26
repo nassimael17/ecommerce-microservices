@@ -20,6 +20,7 @@ export interface Order {
   clientId: number;
   productId: number;
   quantity: number;
+  totalPrice?: number | null;
   status?: OrderStatus;
 }
 
