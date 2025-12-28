@@ -33,8 +33,22 @@ public class ProductService {
             existing.setDescription(updatedProduct.getDescription());
             existing.setPrice(updatedProduct.getPrice());
             existing.setQuantity(updatedProduct.getQuantity());
+            existing.setImageUrl(updatedProduct.getImageUrl());
+            existing.setAvailable(updatedProduct.isAvailable());
             return productRepository.save(existing);
         });
+    }
+
+    public synchronized void reduceStock(Long id, int quantity) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        
+        if (product.getQuantity() < quantity) {
+            throw new RuntimeException("Insufficient stock for product: " + product.getName());
+        }
+        
+        product.setQuantity(product.getQuantity() - quantity);
+        productRepository.save(product);
     }
 
     public void deleteProduct(Long id) {

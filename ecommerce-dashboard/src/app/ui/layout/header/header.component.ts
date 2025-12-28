@@ -1,14 +1,15 @@
-import { Component, output } from '@angular/core';
+import { Component, output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Router } from '@angular/router';
 
 @Component({
-    selector: 'app-header',
-    standalone: true,
-    imports: [CommonModule, MatButtonModule, MatIconModule, MatTooltipModule],
-    template: `
+  selector: 'app-header',
+  standalone: true,
+  imports: [CommonModule, MatButtonModule, MatIconModule, MatTooltipModule],
+  template: `
     <header class="glass-header">
       <div class="search-bar">
         <mat-icon class="search-icon">search</mat-icon>
@@ -16,12 +17,12 @@ import { MatTooltipModule } from '@angular/material/tooltip';
       </div>
 
       <div class="actions">
-        <button mat-icon-button class="action-btn" matTooltip="Notifications">
+        <button mat-icon-button class="action-btn" matTooltip="Notifications" (click)="navigateTo('/app/notifications')">
           <mat-icon>notifications_none</mat-icon>
           <div class="notification-dot"></div>
         </button>
         
-        <button mat-icon-button class="action-btn" matTooltip="Settings">
+        <button mat-icon-button class="action-btn" matTooltip="Settings" (click)="navigateTo('/app/settings')">
           <mat-icon>settings</mat-icon>
         </button>
 
@@ -31,7 +32,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
       </div>
     </header>
   `,
-    styles: [`
+  styles: [`
     :host {
       display: block;
       padding: 0 24px;
@@ -108,5 +109,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   `]
 })
 export class HeaderComponent {
-    onLogout = output<void>();
+  onLogout = output<void>();
+  private router = inject(Router);
+
+  navigateTo(path: string) {
+    this.router.navigate([path]);
+  }
 }

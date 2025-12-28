@@ -8,13 +8,10 @@ public class ProductClientFallback implements ProductClient {
 
     @Override
     public Product getProductById(Long id) {
-        System.err.println("⚠️ Fallback triggered for product ID " + id);
-        return new Product(
-                id,
-                "Unknown Product",
-                "Fallback - product service unavailable",
-                0.0,
-                0
-        );
+        System.err.println("⚠️ Feign Fallback triggered for product ID " + id);
+        return null;
+    @Override
+    public void reduceStock(Long id, int quantity) {
+        System.err.println("[ProductClientFallback] Falling back for reduceStock (Service Unavailable)");
     }
 }

@@ -17,4 +17,8 @@ export class PaymentsApi {
   byOrder(orderId: number) {
     return this.http.get<Payment[]>(`${this.base}/by-order/${orderId}`);
   }
+
+  updateStatus(id: number, status: string) {
+    return this.http.patch<Payment>(`${this.base}/${id}/status`, {}, { params: { status } });
+  }
 }

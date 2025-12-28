@@ -34,16 +34,20 @@ public class OrderService {
         return orderRepository.findById(id).orElse(null);
     }
 
-    @CircuitBreaker(name = "productService", fallbackMethod = "fallbackCreateOrder")
     public Order createOrder(Long productId, Integer quantity, Long clientId) {
         Product product = productClient.getProductById(productId);
-        Client client = clientClient.getClientById(clientId);
-
-        if (product == null || product.getQuantity() < quantity) {
-            throw new RuntimeException("Product not available");
+        
+        if (product == null) {
+            throw new RuntimeException("Product service is currently unavailable. Please try again later.");
         }
+        
+        if (product.getQuantity() < quantity) {
+            throw new RuntimeException("Insufficient stock for product: " + product.getName() + ". Available: " + product.getQuantity());
+        }
+
+        Client client = clientClient.getClientById(clientId);
         if (client == null) {
-            throw new RuntimeException("Client not found");
+            throw new RuntimeException("Client profile not found. Please log in again.");
         }
 
         double totalPrice = product.getPrice() * quantity;
@@ -53,7 +57,7 @@ public class OrderService {
                 .clientId(clientId)
                 .quantity(quantity)
                 .totalPrice(totalPrice)
-                .status("CREATED")
+                .status("PENDING")
                 .build();
 
         Order savedOrder = orderRepository.save(order);
@@ -63,70 +67,80 @@ public class OrderService {
             paymentClient.processPayment(new PaymentRequest(savedOrder.getId(), totalPrice, "CREDIT_CARD"));
             savedOrder.setStatus("PAID");
             orderRepository.save(savedOrder);
+            
+            // 📉 Reduce stock after successful payment
+            productClient.reduceStock(productId, quantity);
+            System.out.println("[OrderService] Stock reduced for Product ID: " + productId + " Quantity: " + quantity);
+            
         } catch (Exception e) {
-            System.err.println("⚠️ Payment failed for order #" + savedOrder.getId() + ": " + e.getMessage());
+            System.err.println("⚠️ Payment failed or stock update failed for order #" + savedOrder.getId() + ": " + e.getMessage());
             savedOrder.setStatus("PAYMENT_FAILED");
             orderRepository.save(savedOrder);
-            // We might still want to notify about failure, but let's stick to success flow for now or separate notification
+            throw new RuntimeException("Order created but payment failed: " + e.getMessage());
         }
 
         // ✅ Send notification message
         try {
-            String statusMsg = savedOrder.getStatus().equals("PAID") ? "paid successfully" : "created (Payment Pending/Failed)";
-            
             NotificationMessage notification = new NotificationMessage(
                     List.of(client.getEmail()), 
                     "+212660553886",
-                    "Order notification",
-                    String.format("📦 Hello %s, your order #%d has been %s! Total: %.2f", client.getFullName(), savedOrder.getId(), statusMsg, totalPrice)
+                    "Order Success",
+                    String.format("Hello %s, your order for %dx %s has been paid successfully! Total: %.2f MAD", 
+                        client.getFullName(), quantity, product.getName(), totalPrice)
             );
 
-            rabbitTemplate.convertAndSend(
-                    "notificationExchange",  
-                    "notificationQueue",     
-                    notification
-            );
-
-            System.out.println("📤 Sent notification message for order #" + savedOrder.getId());
+            rabbitTemplate.convertAndSend("notificationExchange", "notificationQueue", notification);
         } catch (Exception e) {
-            System.err.println("⚠️ Failed to send notification for order #" + savedOrder.getId() + ": " + e.getMessage());
+            System.err.println("⚠️ Notification failed: " + e.getMessage());
         }
 
         return savedOrder;
     }
 
-    // ✅ Fallback when product-service fails
-    public Order fallbackCreateOrder(Long productId, Integer quantity, Long clientId, Throwable t) {
-        System.err.println("⚠️ Fallback triggered for product ID " + productId + ": " + t.getMessage());
+    public Order updateOrderStatus(Long id, String newStatus) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        Order failedOrder = Order.builder()
-                .productId(productId)
-                .clientId(clientId)
-                .quantity(quantity)
-                .totalPrice(0.0)
-                .status("FAILED (Fallback triggered)")
-                .build();
+        String oldStatus = order.getStatus();
+        order.setStatus(newStatus);
+        Order updatedOrder = orderRepository.save(order);
 
-        Order savedOrder = orderRepository.save(failedOrder);
-
+        // Send notification about status change
         try {
-            NotificationMessage notification = new NotificationMessage(
-                    List.of("ajanamehdi751@gmail.com"),
-                    "+212660553886",
-                    "Order notification",
-                    "⚠️ Order #" + savedOrder.getId() + " failed to process (Fallback triggered)."
-            );
+            Client client = clientClient.getClientById(order.getClientId());
+            if (client != null) {
+                String statusMessage = getStatusChangeMessage(newStatus, order.getId(), order.getTotalPrice());
+                
+                NotificationMessage notification = new NotificationMessage(
+                        List.of(client.getEmail()),
+                        "+212660553886",
+                        "Order Status Update",
+                        statusMessage
+                );
 
-            rabbitTemplate.convertAndSend(
-                    "notificationExchange",
-                    "notificationQueue",
-                    notification
-            );
+                rabbitTemplate.convertAndSend(
+                        "notificationExchange",
+                        "notificationQueue",
+                        notification
+                );
+
+                System.out.println("📤 Sent status update notification for order #" + id + ": " + oldStatus + " → " + newStatus);
+            }
         } catch (Exception e) {
-            System.err.println("⚠️ Failed to send fallback notification: " + e.getMessage());
+            System.err.println("⚠️ Failed to send status update notification: " + e.getMessage());
         }
 
-        return savedOrder;
+        return updatedOrder;
+    }
+
+    private String getStatusChangeMessage(String status, Long orderId, Double totalPrice) {
+        return switch (status) {
+            case "CONFIRMED" -> String.format("Your order #%d has been confirmed! Total: %.2f MAD. We're preparing it for shipment.", orderId, totalPrice);
+            case "SHIPPED" -> String.format("Your order #%d has been shipped! Track your delivery.", orderId);
+            case "DELIVERED" -> String.format("Your order #%d has been delivered! Thank you for shopping with us.", orderId);
+            case "CANCELED" -> String.format("Your order #%d has been canceled.", orderId);
+            default -> String.format("Your order #%d status has been updated to: %s", orderId, status);
+        };
     }
 
     public void deleteOrder(Long id) {

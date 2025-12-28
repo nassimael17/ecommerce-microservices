@@ -19,6 +19,7 @@ export class AuthService {
       const user: AuthUser = {
         id: 0,
         email: payload.email.trim(),
+        fullName: 'Admin User',
         role: 'ADMIN',
         token: 'fake-admin-token'
       };
@@ -34,6 +35,7 @@ export class AuthService {
           const user: AuthUser = {
             id: found.id,
             email: found.email,
+            fullName: found.fullName,
             role: 'USER',
             token: 'fake-client-token'
           };
@@ -54,6 +56,10 @@ export class AuthService {
   hasRole(roles: Role[]) {
     const u = this._user();
     return !!u && roles.includes(u.role);
+  }
+
+  updateUser(user: AuthUser) {
+    this.setUser(user);
   }
 
   private setUser(user: AuthUser) {

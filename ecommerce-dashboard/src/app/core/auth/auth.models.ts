@@ -7,7 +7,10 @@ export interface LoginRequest {
 
 export interface AuthUser {
   id?: number;
+  fullName?: string;
   email: string;
   role: Role;
-  token: string; // fake token for now
+  token: string;
+  phone?: string;
+  address?: string;
 }

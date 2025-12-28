@@ -1,9 +1,15 @@
 export interface Product {
   id?: number;
   name: string;
-  description?: string;
+  description: string;
   price: number;
-  stock?: number;
+  quantity: number;
+  imageUrl?: string;
+  available?: boolean;
+}
+
+export interface ChangePasswordRequest {
+  password: string;
 }
 
 export interface Client {
@@ -14,7 +20,7 @@ export interface Client {
   password?: string;
 }
 
-export type OrderStatus = 'CREATED' | 'PAID' | 'SHIPPED' | 'CANCELLED';
+export type OrderStatus = 'PENDING' | 'CREATED' | 'PAID' | 'PAYMENT_FAILED' | 'CONFIRMED' | 'SHIPPED' | 'DELIVERED' | 'CANCELED';
 
 export interface Order {
   id?: number;

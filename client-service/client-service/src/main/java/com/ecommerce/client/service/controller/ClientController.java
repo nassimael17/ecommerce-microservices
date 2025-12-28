@@ -44,16 +44,26 @@ public class ClientController {
   }
 
   @PutMapping("/{id}")
-  public Client update(@PathVariable Long id, @Valid @RequestBody ClientRequest req) {
+  public Client update(@PathVariable Long id, @RequestBody ClientRequest req) {
     Client c = repo.findById(id).orElseThrow(() -> new RuntimeException("Client not found"));
-    c.setFullName(req.fullName());
-    c.setPhone(req.phone());
-    c.setAddress(req.address());
+    if (req.fullName() != null && !req.fullName().isBlank()) c.setFullName(req.fullName());
+    if (req.email() != null && !req.email().isBlank()) c.setEmail(req.email());
+    if (req.phone() != null) c.setPhone(req.phone());
+    if (req.address() != null) c.setAddress(req.address());
     return repo.save(c);
   }
 
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void delete(@PathVariable Long id) { repo.deleteById(id); }
+
+  @PatchMapping("/{id}/password")
+  public void updatePassword(@PathVariable Long id, @RequestBody java.util.Map<String, String> body) {
+    Client c = repo.findById(id).orElseThrow(() -> new RuntimeException("Client not found"));
+    String newPassword = body.get("password");
+    if (newPassword == null || newPassword.isBlank()) throw new RuntimeException("Password cannot be empty");
+    c.setPassword(newPassword);
+    repo.save(c);
+  }
 }
 

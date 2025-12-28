@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+﻿import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -80,45 +80,71 @@ import { MatSelectModule } from '@angular/material/select';
          <h2>Active Orders</h2>
          
          <div class="empty-state" *ngIf="items().length === 0">
-           <div class="empty-icon">📋</div>
-           <h3>No orders yet</h3>
-           <p>Create an order to initiate the process.</p>
-         </div>
- 
-         <div class="orders-list" *ngIf="items().length > 0">
-           <div class="order-item" *ngFor="let o of items()">
-             <div class="order-icon" [class.paid]="o.status==='PAID'" [class.failed]="o.status?.includes('FAILED')">
-               <span class="material-icons">{{ o.status === 'PAID' ? 'check_circle' : 'pending' }}</span>
-             </div>
-             
-             <div class="order-details">
-               <div class="order-header">
-                 <span class="order-id">Order #{{ o.id }}</span>
-                 <span class="status-badge" [class.paid]="o.status==='PAID'" [class.failed]="o.status?.includes('FAILED')">
-                   {{ o.status }}
-                 </span>
-               </div>
-               <div class="order-meta">
-                 📦 {{ getProductName(o.productId) }} × {{ o.quantity }}
-               </div>
-               <div class="order-meta">
-                 👤 {{ getClientName(o.clientId) }}
-               </div>
-             </div>
- 
-             <div class="order-total">
-                {{ o.totalPrice | currency:'MAD ':'symbol':'1.2-2' }}
-             </div>
-             
-             <button class="btn-icon delete" (click)="remove(o)" title="Delete" *ngIf="isAdmin()">
-               <span class="material-icons">delete_outline</span>
-             </button>
-           </div>
-         </div>
-       </div>
-     </div>
-   </div>
-   `,
+          <div class="empty-icon">LIST</div>
+          <h3>No orders yet</h3>
+          <p>Create an order to initiate the process.</p>
+        </div>
+
+        <div class="orders-list" *ngIf="items().length > 0">
+          <div class="order-item" *ngFor="let o of items()">
+            <div class="order-icon" [class.paid]="o.status==='PAID'" [class.failed]="o.status?.includes('FAILED')">
+              <span class="material-icons">{{ o.status === 'PAID' ? 'check_circle' : 'pending' }}</span>
+            </div>
+            
+            <div class="order-details">
+              <div class="order-header">
+                <span class="order-id">Order #{{ o.id }}</span>
+                <span class="status-badge" 
+                      [class.paid]="o.status==='PAID'" 
+                      [class.confirmed]="o.status==='CONFIRMED'"
+                      [class.shipped]="o.status==='SHIPPED'"
+                      [class.delivered]="o.status==='DELIVERED'"
+                      [class.failed]="o.status?.includes('FAILED')"
+                      [class.canceled]="o.status==='CANCELED'">
+                  {{ o.status }}
+                </span>
+              </div>
+              <div class="order-meta">
+                Product: {{ getProductName(o.productId) }} x {{ o.quantity }}
+              </div>
+              <div class="order-meta">
+                Client: {{ getClientName(o.clientId) }}
+              </div>
+            </div>
+
+            <div class="order-total">
+               {{ o.totalPrice | currency:'MAD ':'symbol':'1.2-2' }}
+            </div>
+            
+            
+            <!-- Status Management Buttons (Admin Only) -->
+            <div class="status-actions" *ngIf="isAdmin()">
+              <button class="btn-status confirm" (click)="updateStatus(o, 'CONFIRMED')" 
+                      *ngIf="o.status === 'PENDING'" title="Confirm Order">
+                <span class="material-icons">check</span>
+              </button>
+              <button class="btn-status ship" (click)="updateStatus(o, 'SHIPPED')" 
+                      *ngIf="o.status === 'CONFIRMED'" title="Ship Order">
+                <span class="material-icons">local_shipping</span>
+              </button>
+              <button class="btn-status deliver" (click)="updateStatus(o, 'DELIVERED')" 
+                      *ngIf="o.status === 'SHIPPED'" title="Mark as Delivered">
+                <span class="material-icons">done_all</span>
+              </button>
+              <button class="btn-status cancel" (click)="updateStatus(o, 'CANCELED')" 
+                      *ngIf="o.status !== 'CANCELED' && o.status !== 'DELIVERED'" title="Cancel Order">
+                <span class="material-icons">cancel</span>
+              </button>
+            </div>
+            <button class="btn-icon delete" (click)="remove(o)" title="Delete" *ngIf="isAdmin()">
+              <span class="material-icons">delete_outline</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  `,
   styles: [`
      .page-container {
        padding: 0;
@@ -211,7 +237,7 @@ import { MatSelectModule } from '@angular/material/select';
        text-align: center;
        padding: 40px;
        opacity: 0.5;
-       .empty-icon { font-size: 48px; margin-bottom: 12px; }
+       .empty-icon { font-size: 32px; margin-bottom: 12px; font-weight: 700; opacity: 0.3; }
      }
  
      .orders-list {
@@ -289,7 +315,34 @@ import { MatSelectModule } from '@angular/material/select';
        &:hover { background: rgba(255,255,255,0.15); }
        &.delete:hover { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
      }
-   `]
+
+     .status-actions {
+       display: flex;
+       gap: 8px;
+       margin-right: 8px;
+     }
+
+     .btn-status {
+       background: rgba(255,255,255,0.05);
+       border: none;
+       color: white;
+       width: 32px;
+       height: 32px;
+       border-radius: 6px;
+       cursor: pointer;
+       display: grid;
+       place-items: center;
+       transition: all 0.2s;
+
+       &:hover { background: rgba(255,255,255,0.15); }
+       &.confirm:hover { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+       &.ship:hover { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+       &.deliver:hover { background: rgba(139, 92, 246, 0.2); color: #8b5cf6; }
+       &.cancel:hover { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+       
+       .material-icons { font-size: 18px; }
+     }
+  `]
 })
 export class OrdersComponent {
   items = signal<Order[]>([]);
@@ -371,14 +424,17 @@ export class OrdersComponent {
       next: () => this.loadOrders(),
       error: (e) => {
         console.error(e);
-        alert("Erreur création commande (voir console).");
+        const msg = e.error?.message || 'Order creation failed. Check stock or logs.';
+        alert(msg);
       }
     });
   }
 
   remove(o: Order) {
     if (!o.id) return;
-    this.ordersApi.delete(o.id).subscribe({ next: () => this.loadOrders() });
+    if (confirm('Delete this order?')) {
+      this.ordersApi.delete(o.id).subscribe({ next: () => this.loadOrders() });
+    }
   }
 
   getClientName(id?: number) {
@@ -397,5 +453,19 @@ export class OrdersComponent {
     if (!id) return 'Unknown';
     const p = this.products().find(x => x.id === id);
     return p ? p.name : `Product #${id}`;
+  }
+
+  updateStatus(order: Order, newStatus: string) {
+    if (!order.id) return;
+
+    this.ordersApi.updateStatus(order.id, newStatus).subscribe({
+      next: () => {
+        this.loadOrders();
+      },
+      error: (err) => {
+        console.error('Failed to update order status:', err);
+        alert('Failed to update order status');
+      }
+    });
   }
 }

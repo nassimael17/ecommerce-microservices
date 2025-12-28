@@ -14,42 +14,170 @@ import { MatInputModule } from '@angular/material/input';
   selector: 'app-clients',
   imports: [CommonModule, FormsModule, MatCardModule, MatButtonModule, MatFormFieldModule, MatInputModule],
   template: `
-  <mat-card class="card">
-    <div style="padding:16px; display:flex; gap:12px; flex-wrap:wrap; align-items:end;">
-      <h2 style="margin:0; flex:1 1 auto;">Clients</h2>
+   <div class="page-container fade-in">
+     <div class="glass-panel header-panel">
+       <div class="header-content">
+         <h1>Clients</h1>
+         <p>Manage your client database and relationships.</p>
+       </div>
+       <div class="actions">
+         <button class="btn-icon" (click)="load()" title="Refresh">
+           <span class="material-icons">refresh</span>
+         </button>
+       </div>
+     </div>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Nom complet</mat-label>
-        <input matInput [(ngModel)]="fullName">
-      </mat-form-field>
+     <div class="content-grid single-column">
+       <!-- Clients List Panel -->
+       <div class="glass-panel list-panel">
+         <h2>Client Directory</h2>
+         
+         <div class="empty-state" *ngIf="items().length === 0">
+           <div class="empty-icon">👥</div>
+           <h3>No clients found</h3>
+           <p>Clients will appear here once they register.</p>
+         </div>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Email</mat-label>
-        <input matInput [(ngModel)]="email">
-      </mat-form-field>
+         <div class="clients-list" *ngIf="items().length > 0">
+           <div class="client-item" *ngFor="let c of items()">
+             <div class="client-avatar">
+               {{ c.fullName.charAt(0).toUpperCase() }}
+             </div>
+             
+             <div class="client-info">
+               <div class="client-name">{{ c.fullName }}</div>
+               <div class="client-email">{{ c.email }}</div>
+             </div>
 
-      <button mat-raised-button (click)="add()">Ajouter</button>
-      <button mat-button (click)="load()">Rafraîchir</button>
-    </div>
+             <button class="btn-icon delete" (click)="remove(c)" title="Delete" [disabled]="!c.id">
+               <span class="material-icons">delete_outline</span>
+             </button>
+           </div>
+         </div>
+       </div>
+     </div>
+   </div>
+  `,
+  styles: [`
+    .page-container {
+      padding: 0;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
 
-    <div style="padding:0 16px 16px 16px;">
-      <div *ngIf="items().length===0" style="opacity:.7;">Aucun client (ou API non dispo).</div>
+    .glass-panel {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 24px;
+    }
 
-      <div *ngFor="let c of items()" style="display:flex; justify-content:space-between; padding:12px 0; border-top:1px solid #eee;">
-        <div>
-          <div style="font-weight:600;">{{ c.fullName }}</div>
-          <div style="opacity:.7;">{{ c.email }}</div>
-        </div>
-        <button mat-stroked-button (click)="remove(c)" [disabled]="!c.id">Supprimer</button>
-      </div>
-    </div>
-  </mat-card>
-  `
+    .header-panel {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      h1 { margin: 0; font-size: 24px; font-weight: 700; color: white; }
+      p { margin: 4px 0 0; opacity: 0.6; font-size: 14px; }
+    }
+
+    .content-grid {
+      display: grid;
+      gap: 24px;
+      &.two-columns {
+        grid-template-columns: 350px 1fr;
+        @media (max-width: 900px) { grid-template-columns: 1fr; }
+      }
+    }
+
+    .form-panel {
+      h2 { margin: 0 0 20px; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+      .form-grid { display: flex; flex-direction: column; gap: 16px; }
+      .form-group {
+        label { display: block; font-size: 12px; margin-bottom: 6px; opacity: 0.8; }
+        input {
+          width: 100%;
+          padding: 12px;
+          border-radius: 10px;
+          background: rgba(255,255,255,0.05);
+          border: 1px solid var(--glass-border);
+          color: white;
+          box-sizing: border-box;
+          &:focus { outline: none; border-color: var(--color-primary); background: rgba(255,255,255,0.1); }
+        }
+      }
+      .btn-primary {
+        margin-top: 8px;
+        padding: 12px;
+        border-radius: 10px;
+        background: var(--color-primary);
+        color: white;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+        transition: all 0.2s;
+        &:hover { filter: brightness(1.1); }
+        &:disabled { opacity: 0.5; cursor: not-allowed; }
+      }
+    }
+
+    .clients-list { display: flex; flex-direction: column; gap: 12px; }
+
+    .client-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.03);
+      transition: all 0.2s;
+      &:hover { background: rgba(255,255,255,0.05); }
+    }
+
+    .client-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--color-primary-gradient);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .client-info { flex: 1; }
+    .client-name { font-weight: 600; font-size: 15px; color: white; }
+    .client-email { font-size: 13px; opacity: 0.6; }
+
+    .btn-icon {
+      background: rgba(255,255,255,0.05);
+      border: none;
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: all 0.2s;
+      &:hover { background: rgba(255,255,255,0.1); }
+      &.delete:hover { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      opacity: 0.5;
+      .empty-icon { font-size: 48px; margin-bottom: 12px; }
+    }
+  `]
 })
 export class ClientsComponent {
   items = signal<Client[]>([]);
-  fullName = '';
-  email = '';
 
   constructor(private api: ClientsApi) { this.load(); }
 
@@ -57,15 +185,10 @@ export class ClientsComponent {
     this.api.list().subscribe({ next: v => this.items.set(v), error: () => this.items.set([]) });
   }
 
-  add() {
-    if (!this.fullName.trim() || !this.email.trim()) return;
-    this.api.create({ fullName: this.fullName.trim(), email: this.email.trim() }).subscribe({
-      next: () => { this.fullName=''; this.email=''; this.load(); }
-    });
-  }
-
   remove(c: Client) {
     if (!c.id) return;
-    this.api.delete(c.id).subscribe({ next: () => this.load() });
+    if (confirm('Are you sure you want to delete this client?')) {
+      this.api.delete(c.id).subscribe({ next: () => this.load() });
+    }
   }
 }

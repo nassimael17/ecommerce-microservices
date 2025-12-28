@@ -19,5 +19,10 @@ export class OrdersApi {
     return this.http.post<Order>(this.base, null, { params });
   }
 
+  updateStatus(orderId: number, status: string) {
+    const params = new HttpParams().set('status', status);
+    return this.http.patch<Order>(`${this.base}/${orderId}/status`, null, { params });
+  }
+
   delete(id: number) { return this.http.delete<void>(`${this.base}/${id}`); }
 }

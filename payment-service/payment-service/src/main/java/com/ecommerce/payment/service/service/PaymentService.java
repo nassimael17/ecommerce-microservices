@@ -20,6 +20,17 @@ public class PaymentService {
   private final RabbitTemplate rabbitTemplate;
 
   public Payment pay(Long orderId, Double amount, PaymentRequest request) {
+    // 1) validate and determine status
+    // Simulate failure for specific CVV or invalid amounts
+    boolean isSuccessful = amount != null && amount > 0 && !"999".equals(request.cardNumber()); // Using cardNumber since CVV is often 123
+    
+    // Actually, request has a cvv field, let's use it
+    if (request.cvv() != null && "999".equals(request.cvv())) {
+        isSuccessful = false;
+    }
+
+    String status = isSuccessful ? "PAID" : "FAILED";
+
     // 1) save payment
     Payment p = Payment.builder()
       .orderId(orderId)
@@ -29,25 +40,29 @@ public class PaymentService {
       .cvv(request.cvv())
       .expiryDate(request.expiryDate())
       .ownerName(request.ownerName())
-      .status("PAID")
+      .status(status)
       .createdAt(Instant.now())
       .build();
     Payment saved = repo.save(p);
 
-    // 2) update order status -> PAID
-    try {
-      orderClient.updateStatus(orderId, new OrderClient.StatusReq("PAID"));
-    } catch (Exception e) {
-      // don't fail payment, but mark info in logs
-      System.err.println("⚠️ Failed to update order status for orderId=" + orderId + ": " + e.getMessage());
+    // 2) update order status -> Only if PAID
+    if (isSuccessful) {
+        try {
+          orderClient.updateStatus(orderId, new OrderClient.StatusReq("PAID"));
+          System.out.println("[PaymentService] Order #" + orderId + " updated to PAID");
+        } catch (Exception e) {
+          System.err.println("[PaymentService] Failed to update order status for orderId=" + orderId + ": " + e.getMessage());
+        }
+    } else {
+        System.err.println("[PaymentService] Payment FAILED for Order #" + orderId + ". Status remains PENDING.");
     }
 
-    // 3) async notification (email/sms simulated by your notification-service)
+    // 3) async notification
     try {
       NotificationMessage msg = new NotificationMessage(
-        List.of("admin@demo.com"), // keep simple for demo (you can replace later)
+        List.of("admin@demo.com"), 
         "+212000000000",
-        "✅ Payment received for Order #" + orderId + " (amount=" + amount + ", method=" + request.method() + ")"
+        "Payment " + status + " for Order #" + orderId + " (MAD " + String.format("%.2f", amount) + " via " + request.method() + ")"
       );
 
       rabbitTemplate.convertAndSend(
@@ -64,6 +79,12 @@ public class PaymentService {
 
   public java.util.List<Payment> all() { return repo.findAll(); }
   public java.util.List<Payment> byOrder(Long orderId) { return repo.findByOrderId(orderId); }
+
+  public Payment updateStatus(Long id, String status) {
+    Payment p = repo.findById(id).orElseThrow(() -> new RuntimeException("Payment not found"));
+    p.setStatus(status);
+    return repo.save(p);
+  }
 
   public record NotificationMessage(java.util.List<String> toList, String phone, String text) {}
 }

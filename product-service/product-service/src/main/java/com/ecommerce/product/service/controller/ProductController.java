@@ -44,4 +44,9 @@ public class ProductController {
     public void deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
     }
+
+    @PostMapping("/{id}/reduce-stock")
+    public void reduceStock(@PathVariable Long id, @RequestParam int quantity) {
+        productService.reduceStock(id, quantity);
+    }
 }

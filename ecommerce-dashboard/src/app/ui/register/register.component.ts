@@ -6,10 +6,10 @@ import { Router, RouterLink } from '@angular/router';
 import { ClientsApi } from '../../api/clients.api';
 
 @Component({
-    standalone: true,
-    selector: 'app-register',
-    imports: [CommonModule, FormsModule, RouterLink],
-    template: `
+  standalone: true,
+  selector: 'app-register',
+  imports: [CommonModule, FormsModule, RouterLink],
+  template: `
     <div class="login-container">
       <div class="glass-card fade-in">
         <div class="logo">
@@ -44,7 +44,7 @@ import { ClientsApi } from '../../api/clients.api';
       </div>
     </div>
   `,
-    styles: [`
+  styles: [`
     .login-container {
       height: 100vh;
       display: flex;
@@ -156,27 +156,33 @@ import { ClientsApi } from '../../api/clients.api';
   `]
 })
 export class RegisterComponent {
-    private router = inject(Router);
-    private api = inject(ClientsApi);
+  private router = inject(Router);
+  private api = inject(ClientsApi);
 
-    fullName = '';
-    email = '';
-    password = '';
+  fullName = '';
+  email = '';
+  password = '';
 
-    register() {
-        if (!this.email || !this.password || !this.fullName) return;
-
-        // In real app we would call register, which creates client AND logs them in.
-        // Here we just create the client record.
-        this.api.create({
-            fullName: this.fullName,
-            email: this.email,
-            password: this.password
-        }).subscribe({
-            next: () => {
-                // Redirect to login after successful registration
-                this.router.navigate(['/login']);
-            }
-        });
+  register() {
+    if (!this.email || !this.password || !this.fullName) {
+      alert('Please fill in all fields');
+      return;
     }
+
+    this.api.create({
+      fullName: this.fullName,
+      email: this.email,
+      password: this.password
+    }).subscribe({
+      next: () => {
+        alert('Account created successfully! Please login.');
+        this.router.navigate(['/login']);
+      },
+      error: (err) => {
+        console.error('Registration failed:', err);
+        const errorMsg = err.error?.message || err.message || 'Registration failed. Please try again.';
+        alert(errorMsg);
+      }
+    });
+  }
 }

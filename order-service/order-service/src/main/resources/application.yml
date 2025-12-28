@@ -52,31 +52,39 @@ feign:
       default:
         connectTimeout: 5000
         readTimeout: 5000
+      product-service:
+        loggerLevel: FULL
+      client-service:
+        loggerLevel: BASIC
+      payment-service:
+        loggerLevel: BASIC
 
 resilience4j.circuitbreaker:
   instances:
     productService:
-      slidingWindowSize: 10
-      failureRateThreshold: 70
-      waitDurationInOpenState: 5s
-      permittedNumberOfCallsInHalfOpenState: 3
+      slidingWindowSize: 20
+      failureRateThreshold: 80
+      waitDurationInOpenState: 10s
+      permittedNumberOfCallsInHalfOpenState: 5
       automaticTransitionFromOpenToHalfOpenEnabled: true
+      minimumNumberOfCalls: 5
+      ignoreExceptions:
+        - java.lang.RuntimeException # Business exceptions are usually RuntimeException here
 
 resilience4j.retry:
   instances:
     productService:
       maxAttempts: 3
-      waitDuration: 2s
+      waitDuration: 1s
+      retryExceptions:
+        - feign.FeignException$ServiceUnavailable
+        - feign.FeignException$InternalServerError
+
+
 
 logging:
   level:
-    com.ecommerce.order.service.client.ProductClient: DEBUG
+    com.ecommerce.order.service.client: DEBUG
+    io.github.resilience4j: DEBUG
     org.springframework.cloud.openfeign: DEBUG
     feign: DEBUG
-    io.github.resilience4j: DEBUG
-
-  resilience4j.retry:
-  instances:
-    productService:
-      maxAttempts: 5
-      waitDuration: 2s

@@ -166,13 +166,13 @@ import { AuthService } from '../../../core/auth/auth.service';
 export class SidebarComponent {
   private auth = inject(AuthService);
 
-  allItems = [
+  allItems: Array<{ link: string, icon: string, label: string, roles: string[], badge?: string }> = [
     { link: '/app/dashboard', icon: 'dashboard', label: 'Dashboard', roles: ['ADMIN', 'USER'] },
-    { link: '/app/products', icon: 'inventory_2', label: 'Products', roles: ['ADMIN', 'USER'] },
-    { link: '/app/orders', icon: 'shopping_cart', label: 'Orders', badge: '3', roles: ['ADMIN', 'USER'] },
+    { link: '/app/products', icon: 'shopping_bag', label: 'Shop', roles: ['ADMIN', 'USER'] },
+    { link: '/app/admin/products', icon: 'inventory_2', label: 'Inventory', roles: ['ADMIN'] },
+    { link: '/app/orders', icon: 'view_list', label: 'Orders', roles: ['ADMIN', 'USER'], badge: '3' },
     { link: '/app/payments', icon: 'payments', label: 'Payments', roles: ['ADMIN', 'USER'] },
-    { link: '/app/clients', icon: 'group', label: 'Clients', roles: ['ADMIN'] }, // Admin only
-    { link: '/app/notifications', icon: 'notifications', label: 'Notifications', roles: ['ADMIN'] }, // Admin only
+    { link: '/app/clients', icon: 'group', label: 'Clients', roles: ['ADMIN'] },
     { link: '/app/settings', icon: 'settings', label: 'Settings', roles: ['ADMIN', 'USER'] },
   ];
 
@@ -182,7 +182,7 @@ export class SidebarComponent {
     return this.allItems.filter(i => this.auth.hasRole(i.roles as any));
   });
 
-  userName = computed(() => this.auth.user()?.email.split('@')[0] || 'User');
+  userName = computed(() => this.auth.user()?.fullName || this.auth.user()?.email.split('@')[0] || 'User');
   userRole = computed(() => this.auth.user()?.role || 'Guest');
   initials = computed(() => this.userName().substring(0, 2).toUpperCase());
 }

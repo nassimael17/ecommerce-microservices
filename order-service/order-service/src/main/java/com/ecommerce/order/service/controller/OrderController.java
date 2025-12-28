@@ -27,6 +27,11 @@ public class OrderController {
         return orderService.createOrder(productId, quantity, clientId);
     }
 
+    @PatchMapping("/{id}/status")
+    public Order updateOrderStatus(@PathVariable Long id, @RequestParam String status) {
+        return orderService.updateOrderStatus(id, status);
+    }
+
     @DeleteMapping("/{id}")
     public void deleteOrder(@PathVariable Long id) {
         orderService.deleteOrder(id);

@@ -30,5 +30,10 @@ public class PaymentController {
   public Payment pay(@Valid @RequestBody PaymentRequest req) {
     return service.pay(req.orderId(), req.amount(), req);
   }
+
+  @PatchMapping("/{id}/status")
+  public Payment updateStatus(@PathVariable Long id, @RequestParam String status) {
+    return service.updateStatus(id, status);
+  }
 }
 
