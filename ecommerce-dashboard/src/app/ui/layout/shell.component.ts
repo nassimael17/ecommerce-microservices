@@ -1,82 +1,106 @@
-import { Component, computed } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/auth/auth.service';
-
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatIconModule } from '@angular/material/icon';
-import { MatListModule } from '@angular/material/list';
-import { MatButtonModule } from '@angular/material/button';
+import { SidebarComponent } from './sidebar/sidebar.component';
+import { HeaderComponent } from './header/header.component';
 
 @Component({
   standalone: true,
   selector: 'app-shell',
   imports: [
     CommonModule,
-    RouterOutlet, RouterLink, RouterLinkActive,
-    MatSidenavModule, MatToolbarModule, MatIconModule, MatListModule, MatButtonModule
+    RouterOutlet,
+    SidebarComponent,
+    HeaderComponent
   ],
   template: `
-  <mat-sidenav-container style="height:100vh">
-    <mat-sidenav mode="side" opened>
-      <div style="padding:16px; font-weight:700;">Ecommerce Admin</div>
+    <div class="app-layout">
+      <aside class="sidebar-area">
+        <app-sidebar></app-sidebar>
+      </aside>
 
-      <mat-nav-list>
-        <a mat-list-item routerLink="/app/dashboard" routerLinkActive="active">
-          <mat-icon>dashboard</mat-icon>
-          <span style="margin-left:8px;">Dashboard</span>
-        </a>
+      <main class="main-content">
+        <app-header (onLogout)="logout()"></app-header>
+        
+        <div class="content-wrapper">
+          <router-outlet></router-outlet>
+        </div>
+      </main>
 
-        <a mat-list-item routerLink="/app/products" routerLinkActive="active">
-          <mat-icon>inventory_2</mat-icon>
-          <span style="margin-left:8px;">Produits</span>
-        </a>
-
-        <a mat-list-item routerLink="/app/orders" routerLinkActive="active">
-          <mat-icon>shopping_cart</mat-icon>
-          <span style="margin-left:8px;">Commandes</span>
-        </a>
-
-        <a mat-list-item routerLink="/app/payments" routerLinkActive="active">
-          <mat-icon>payments</mat-icon>
-          <span style="margin-left:8px;">Paiements</span>
-        </a>
-
-        <a mat-list-item routerLink="/app/clients" routerLinkActive="active">
-          <mat-icon>group</mat-icon>
-          <span style="margin-left:8px;">Clients</span>
-        </a>
-
-        <a mat-list-item routerLink="/app/notifications" routerLinkActive="active">
-          <mat-icon>notifications</mat-icon>
-          <span style="margin-left:8px;">Notifications</span>
-        </a>
-      </mat-nav-list>
-    </mat-sidenav>
-
-    <mat-sidenav-content>
-      <mat-toolbar>
-        <span style="font-weight:600;">{{ title() }}</span>
-        <span style="flex:1 1 auto;"></span>
-
-        <span style="margin-right:12px; opacity:.8;">{{ userEmail() }}</span>
-        <button mat-raised-button (click)="logout()">Logout</button>
-      </mat-toolbar>
-
-      <div class="container">
-        <router-outlet></router-outlet>
-      </div>
-    </mat-sidenav-content>
-  </mat-sidenav-container>
+      <!-- Decorative Background Blobs -->
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+    </div>
   `,
-  styles: [`.active{font-weight:600}`]
+  styles: [`
+    :host {
+      display: block;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .app-layout {
+      display: flex;
+      height: 100%;
+      position: relative;
+      background: var(--color-bg-body);
+      z-index: 1;
+    }
+
+    .sidebar-area {
+      width: 260px;
+      flex-shrink: 0;
+      z-index: 20;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 10;
+      overflow: hidden;
+    }
+
+    .content-wrapper {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0; // Padding handled by child components or global .container
+    }
+
+    /* Decorative Blobs */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      transition: all 5s ease;
+      opacity: 0.4;
+      z-index: 0;
+    }
+
+    .blob-1 {
+      top: -10%;
+      left: -10%;
+      width: 500px;
+      height: 500px;
+      background: var(--color-primary);
+    }
+
+    .blob-2 {
+      bottom: -10%;
+      right: -10%;
+      width: 600px;
+      height: 600px;
+      background: var(--color-secondary);
+    }
+  `]
 })
 export class ShellComponent {
-  constructor(private auth: AuthService) {}
+  constructor(private auth: AuthService) { }
 
-  userEmail = computed(() => this.auth.user()?.email ?? '');
-  title = computed(() => 'Microservices Dashboard');
-
-  logout() { this.auth.logout(); location.href = '/login'; }
+  logout() {
+    this.auth.logout();
+    location.href = '/login';
+  }
 }

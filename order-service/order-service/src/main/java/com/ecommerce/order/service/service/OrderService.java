@@ -1,6 +1,10 @@
 package com.ecommerce.order.service.service;
 
 import com.ecommerce.order.service.client.ProductClient;
+import com.ecommerce.order.service.client.ClientClient;
+import com.ecommerce.order.service.client.PaymentClient;
+import com.ecommerce.order.service.dto.PaymentRequest;
+import com.ecommerce.order.service.model.Client;
 import com.ecommerce.order.service.model.NotificationMessage;
 import com.ecommerce.order.service.model.Order;
 import com.ecommerce.order.service.model.Product;
@@ -18,6 +22,8 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final ProductClient productClient;
+    private final ClientClient clientClient;
+    private final PaymentClient paymentClient;
     private final RabbitTemplate rabbitTemplate;
 
     public List<Order> getAllOrders() {
@@ -29,17 +35,22 @@ public class OrderService {
     }
 
     @CircuitBreaker(name = "productService", fallbackMethod = "fallbackCreateOrder")
-    public Order createOrder(Long productId, Integer quantity) {
+    public Order createOrder(Long productId, Integer quantity, Long clientId) {
         Product product = productClient.getProductById(productId);
+        Client client = clientClient.getClientById(clientId);
 
         if (product == null || product.getQuantity() < quantity) {
             throw new RuntimeException("Product not available");
+        }
+        if (client == null) {
+            throw new RuntimeException("Client not found");
         }
 
         double totalPrice = product.getPrice() * quantity;
 
         Order order = Order.builder()
                 .productId(productId)
+                .clientId(clientId)
                 .quantity(quantity)
                 .totalPrice(totalPrice)
                 .status("CREATED")
@@ -47,18 +58,32 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
+        // ✅ Process Payment
+        try {
+            paymentClient.processPayment(new PaymentRequest(savedOrder.getId(), totalPrice, "CREDIT_CARD"));
+            savedOrder.setStatus("PAID");
+            orderRepository.save(savedOrder);
+        } catch (Exception e) {
+            System.err.println("⚠️ Payment failed for order #" + savedOrder.getId() + ": " + e.getMessage());
+            savedOrder.setStatus("PAYMENT_FAILED");
+            orderRepository.save(savedOrder);
+            // We might still want to notify about failure, but let's stick to success flow for now or separate notification
+        }
+
         // ✅ Send notification message
         try {
+            String statusMsg = savedOrder.getStatus().equals("PAID") ? "paid successfully" : "created (Payment Pending/Failed)";
+            
             NotificationMessage notification = new NotificationMessage(
-                    List.of("ajanamehdi751@gmail.com"),
+                    List.of(client.getEmail()), 
                     "+212660553886",
                     "Order notification",
-                    "📦 Your order #" + savedOrder.getId() + " has been created successfully!"
+                    String.format("📦 Hello %s, your order #%d has been %s! Total: %.2f", client.getFullName(), savedOrder.getId(), statusMsg, totalPrice)
             );
 
             rabbitTemplate.convertAndSend(
-                    "notificationExchange",  // Exchange
-                    "notificationQueue",     // Routing key
+                    "notificationExchange",  
+                    "notificationQueue",     
                     notification
             );
 
@@ -71,11 +96,12 @@ public class OrderService {
     }
 
     // ✅ Fallback when product-service fails
-    public Order fallbackCreateOrder(Long productId, Integer quantity, Throwable t) {
+    public Order fallbackCreateOrder(Long productId, Integer quantity, Long clientId, Throwable t) {
         System.err.println("⚠️ Fallback triggered for product ID " + productId + ": " + t.getMessage());
 
         Order failedOrder = Order.builder()
                 .productId(productId)
+                .clientId(clientId)
                 .quantity(quantity)
                 .totalPrice(0.0)
                 .status("FAILED (Fallback triggered)")
@@ -96,8 +122,6 @@ public class OrderService {
                     "notificationQueue",
                     notification
             );
-
-            System.out.println("📤 Sent fallback notification for order #" + savedOrder.getId());
         } catch (Exception e) {
             System.err.println("⚠️ Failed to send fallback notification: " + e.getMessage());
         }

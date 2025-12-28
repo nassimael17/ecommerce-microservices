@@ -6,15 +6,16 @@ import { Order } from './api.models';
 export class OrdersApi {
   private base = '/api/orders';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   list() { return this.http.get<Order[]>(this.base); }
 
   // ✅ match backend: POST /api/orders?productId=...&quantity=...
-  create(productId: number, quantity: number) {
+  create(productId: number, quantity: number, clientId: number) {
     const params = new HttpParams()
       .set('productId', String(productId))
-      .set('quantity', String(quantity));
+      .set('quantity', String(quantity))
+      .set('clientId', String(clientId));
     return this.http.post<Order>(this.base, null, { params });
   }
 

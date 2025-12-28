@@ -11,6 +11,7 @@ export interface Client {
   fullName: string;
   email: string;
   phone?: string;
+  password?: string;
 }
 
 export type OrderStatus = 'CREATED' | 'PAID' | 'SHIPPED' | 'CANCELLED';
@@ -39,4 +40,8 @@ export interface Payment {
   method: string;   // CARD/CASH/...
   status?: string;  // PAID/FAILED/...
   createdAt?: string;
+  cardNumber?: string;
+  cvv?: string;
+  expiryDate?: string;
+  ownerName?: string;
 }

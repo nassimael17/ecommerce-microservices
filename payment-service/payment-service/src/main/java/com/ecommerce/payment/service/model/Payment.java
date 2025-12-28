@@ -22,6 +22,12 @@ public class Payment {
   @Column(nullable = false)
   private String method; // CARD/CASH...
 
+  // New fields for CARD payment
+  private String cardNumber;
+  private String cvv;
+  private String expiryDate;
+  private String ownerName;
+
   @Column(nullable = false)
   private String status; // PAID/FAILED
 

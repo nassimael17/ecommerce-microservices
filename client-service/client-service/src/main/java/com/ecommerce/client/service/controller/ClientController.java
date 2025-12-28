@@ -35,6 +35,7 @@ public class ClientController {
     Client c = Client.builder()
       .fullName(req.fullName())
       .email(req.email())
+      .password(req.password()) // In real app, hash this!
       .phone(req.phone())
       .address(req.address())
       .createdAt(Instant.now())

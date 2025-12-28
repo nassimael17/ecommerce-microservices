@@ -1,0 +1,57 @@
+
+// ----------------------------------------------------------------------------
+//  PREMIUM THEME (Glassmorphism & Vibrant Gradients)
+// ----------------------------------------------------------------------------
+
+:root {
+  // --- Palettes (OKLCH where supported, else HSL fallback idea) ---
+  --primary-hue: 250;
+  --secondary-hue: 320;
+
+  --color-primary: oklch(55% 0.22 260);        // Deep Royal Purple / Blue
+  --color-primary-light: oklch(65% 0.18 260);
+  --color-secondary: oklch(60% 0.22 320);      // Vibrant Magenta/Pink
+  
+  --color-accent: oklch(70% 0.2 160);          // Mint/Success
+  --color-danger: oklch(60% 0.2 25);           // Red
+
+  --color-bg-body: #0f111a;                    // Dark/Deep Navy Background
+  --color-bg-surface: #191c29;
+
+  --color-text-main: #ffffff;
+  --color-text-muted: #94a3b8;
+
+  // --- Glassmorphism ---
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  --glass-blur: 12px;
+
+  // --- Typography ---
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  // --- Spacing ---
+  --radius-xl: 24px;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+}
+
+// Global Mixins
+@mixin glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--radius-lg);
+}
+
+@mixin gradient-text {
+  background: linear-gradient(135deg, var(--color-primary-light), var(--color-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}

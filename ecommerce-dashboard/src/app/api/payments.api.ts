@@ -6,11 +6,11 @@ import { Payment } from './api.models';
 export class PaymentsApi {
   private base = '/api/payments';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   list() { return this.http.get<Payment[]>(this.base); }
 
-  create(p: { orderId: number; amount: number; method: string }) {
+  create(p: Partial<Payment>) {
     return this.http.post<Payment>(this.base, p);
   }
 

@@ -23,8 +23,8 @@ public class OrderController {
     }
 
     @PostMapping
-    public Order createOrder(@RequestParam Long productId, @RequestParam Integer quantity) {
-        return orderService.createOrder(productId, quantity);
+    public Order createOrder(@RequestParam Long productId, @RequestParam Integer quantity, @RequestParam Long clientId) {
+        return orderService.createOrder(productId, quantity, clientId);
     }
 
     @DeleteMapping("/{id}")

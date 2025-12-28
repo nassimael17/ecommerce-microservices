@@ -1,28 +1,49 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { AuthUser, LoginRequest, Role } from './auth.models';
+import { ClientsApi } from '../../api/clients.api';
+import { of, map, catchError } from 'rxjs';
 
 const STORAGE_KEY = 'auth_user';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private api = inject(ClientsApi);
   private _user = signal<AuthUser | null>(this.readFromStorage());
 
   user = computed(() => this._user());
   isLoggedIn = computed(() => !!this._user());
 
   login(payload: LoginRequest) {
-    // Fake auth for now (until you implement real auth in backend)
-    // Rule: if email contains "admin" => ADMIN else USER
-    const role: Role = payload.email.toLowerCase().includes('admin') ? 'ADMIN' : 'USER';
+    // 1. Check for Admin bypass
+    if (payload.email.toLowerCase().includes('admin') && payload.password === 'admin') {
+      const user: AuthUser = {
+        id: 0,
+        email: payload.email.trim(),
+        role: 'ADMIN',
+        token: 'fake-admin-token'
+      };
+      this.setUser(user);
+      return of(true);
+    }
 
-    const user: AuthUser = {
-      email: payload.email.trim(),
-      role,
-      token: 'fake-jwt-token'
-    };
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-    this._user.set(user);
+    // 2. Check against Clients API
+    return this.api.list().pipe(
+      map(clients => {
+        const found = clients.find(c => c.email === payload.email && c.password === payload.password);
+        if (found) {
+          const user: AuthUser = {
+            id: found.id,
+            email: found.email,
+            role: 'USER',
+            token: 'fake-client-token'
+          };
+          this.setUser(user);
+          return true;
+        }
+        return false;
+      }),
+      catchError(() => of(false))
+    );
   }
 
   logout() {
@@ -33,6 +54,11 @@ export class AuthService {
   hasRole(roles: Role[]) {
     const u = this._user();
     return !!u && roles.includes(u.role);
+  }
+
+  private setUser(user: AuthUser) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+    this._user.set(user);
   }
 
   private readFromStorage(): AuthUser | null {

@@ -19,6 +19,8 @@ public class Client {
   @Column(nullable = false, unique = true)
   private String email;
 
+  private String password;
+
   private String phone;
   private String address;
 

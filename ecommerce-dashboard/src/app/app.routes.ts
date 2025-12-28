@@ -13,6 +13,7 @@ export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
 
   { path: 'login', component: LoginComponent },
+  { path: 'register', loadComponent: () => import('./ui/register/register.component').then(m => m.RegisterComponent) },
 
   {
     path: 'app',
@@ -26,7 +27,8 @@ export const routes: Routes = [
       { path: 'products', component: ProductsComponent },
       { path: 'orders', component: OrdersComponent },
       { path: 'clients', component: ClientsComponent },
-      { path: 'notifications', component: NotificationsComponent }
+      { path: 'notifications', component: NotificationsComponent },
+      { path: 'settings', loadComponent: () => import('./ui/settings/settings.component').then(m => m.SettingsComponent) }
     ]
   },
 

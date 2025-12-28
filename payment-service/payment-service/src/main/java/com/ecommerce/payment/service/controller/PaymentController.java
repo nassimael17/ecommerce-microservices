@@ -28,7 +28,7 @@ public class PaymentController {
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   public Payment pay(@Valid @RequestBody PaymentRequest req) {
-    return service.pay(req.orderId(), req.amount(), req.method());
+    return service.pay(req.orderId(), req.amount(), req);
   }
 }
 

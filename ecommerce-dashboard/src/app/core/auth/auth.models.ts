@@ -6,6 +6,7 @@ export interface LoginRequest {
 }
 
 export interface AuthUser {
+  id?: number;
   email: string;
   role: Role;
   token: string; // fake token for now

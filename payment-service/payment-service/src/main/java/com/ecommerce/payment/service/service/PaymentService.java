@@ -2,6 +2,7 @@ package com.ecommerce.payment.service.service;
 
 import com.ecommerce.payment.service.client.OrderClient;
 import com.ecommerce.payment.service.model.Payment;
+import com.ecommerce.payment.service.dto.PaymentRequest;
 import com.ecommerce.payment.service.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -18,12 +19,16 @@ public class PaymentService {
   private final OrderClient orderClient;
   private final RabbitTemplate rabbitTemplate;
 
-  public Payment pay(Long orderId, Double amount, String method) {
+  public Payment pay(Long orderId, Double amount, PaymentRequest request) {
     // 1) save payment
     Payment p = Payment.builder()
       .orderId(orderId)
       .amount(amount)
-      .method(method)
+      .method(request.method())
+      .cardNumber(request.cardNumber())
+      .cvv(request.cvv())
+      .expiryDate(request.expiryDate())
+      .ownerName(request.ownerName())
       .status("PAID")
       .createdAt(Instant.now())
       .build();
@@ -42,7 +47,7 @@ public class PaymentService {
       NotificationMessage msg = new NotificationMessage(
         List.of("admin@demo.com"), // keep simple for demo (you can replace later)
         "+212000000000",
-        "✅ Payment received for Order #" + orderId + " (amount=" + amount + ", method=" + method + ")"
+        "✅ Payment received for Order #" + orderId + " (amount=" + amount + ", method=" + request.method() + ")"
       );
 
       rabbitTemplate.convertAndSend(
