@@ -1,6 +1,10 @@
-/home/mehdi-ajana/Java-Project/ecommerce-microservices/product-service/product-service/src/main/java/com/ecommerce/product/service/App.java
-/home/mehdi-ajana/Java-Project/ecommerce-microservices/product-service/product-service/src/main/java/com/ecommerce/product/service/MainApplication.java
-/home/mehdi-ajana/Java-Project/ecommerce-microservices/product-service/product-service/src/main/java/com/ecommerce/product/service/controller/ProductController.java
-/home/mehdi-ajana/Java-Project/ecommerce-microservices/product-service/product-service/src/main/java/com/ecommerce/product/service/model/Product.java
-/home/mehdi-ajana/Java-Project/ecommerce-microservices/product-service/product-service/src/main/java/com/ecommerce/product/service/repository/ProductRepository.java
-/home/mehdi-ajana/Java-Project/ecommerce-microservices/product-service/product-service/src/main/java/com/ecommerce/product/service/service/ProductService.java
+/home/mehdi-ajana/.gemini/antigravity/scratch/ecommerce-microservices/product-service/product-service/src/main/java/com/ecommerce/product/service/App.java
+/home/mehdi-ajana/.gemini/antigravity/scratch/ecommerce-microservices/product-service/product-service/src/main/java/com/ecommerce/product/service/MainApplication.java
+/home/mehdi-ajana/.gemini/antigravity/scratch/ecommerce-microservices/product-service/product-service/src/main/java/com/ecommerce/product/service/config/DataLoader.java
+/home/mehdi-ajana/.gemini/antigravity/scratch/ecommerce-microservices/product-service/product-service/src/main/java/com/ecommerce/product/service/config/SecurityConfig.java
+/home/mehdi-ajana/.gemini/antigravity/scratch/ecommerce-microservices/product-service/product-service/src/main/java/com/ecommerce/product/service/controller/ProductController.java
+/home/mehdi-ajana/.gemini/antigravity/scratch/ecommerce-microservices/product-service/product-service/src/main/java/com/ecommerce/product/service/model/Product.java
+/home/mehdi-ajana/.gemini/antigravity/scratch/ecommerce-microservices/product-service/product-service/src/main/java/com/ecommerce/product/service/repository/ProductRepository.java
+/home/mehdi-ajana/.gemini/antigravity/scratch/ecommerce-microservices/product-service/product-service/src/main/java/com/ecommerce/product/service/security/JwtAuthenticationFilter.java
+/home/mehdi-ajana/.gemini/antigravity/scratch/ecommerce-microservices/product-service/product-service/src/main/java/com/ecommerce/product/service/security/JwtTokenProvider.java
+/home/mehdi-ajana/.gemini/antigravity/scratch/ecommerce-microservices/product-service/product-service/src/main/java/com/ecommerce/product/service/service/ProductService.java

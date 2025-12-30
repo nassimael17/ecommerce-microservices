@@ -1,7 +1,11 @@
 com/ecommerce/product/service/model/Product$ProductBuilder.class
 com/ecommerce/product/service/MainApplication.class
 com/ecommerce/product/service/model/Product.class
+com/ecommerce/product/service/config/SecurityConfig.class
 com/ecommerce/product/service/service/ProductService.class
 com/ecommerce/product/service/App.class
+com/ecommerce/product/service/config/DataLoader.class
+com/ecommerce/product/service/security/JwtAuthenticationFilter.class
 com/ecommerce/product/service/controller/ProductController.class
+com/ecommerce/product/service/security/JwtTokenProvider.class
 com/ecommerce/product/service/repository/ProductRepository.class
