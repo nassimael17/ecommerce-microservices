@@ -129,8 +129,8 @@ services:
     ports:
       - "8083:8083"
     environment:
-      - MAIL_USERNAME=ajanamehdi751@gmail.com
-      - MAIL_PASSWORD=gzvl hfzs crgn yuum
+      - MAIL_USERNAME="elhattabinassima004@gmail.com"
+      - MAIL_PASSWORD="wons eutf alxz jtvr"
     depends_on:
       - rabbitmq
       - eureka-server

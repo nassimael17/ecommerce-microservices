@@ -17,11 +17,12 @@ public class EmailService {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            
+
             helper.setTo(toList.toArray(new String[0]));
             helper.setSubject(subject);
             helper.setText(text, false); // false = plain text
-            
+            helper.setFrom("elhattabinassima004@gmail.com", "E-Shop");
+
             mailSender.send(message);
             System.out.println("📧 Email (UTF-8) sent to " + toList);
         } catch (Exception e) {

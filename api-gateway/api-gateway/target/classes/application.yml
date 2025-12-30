@@ -5,9 +5,6 @@ spring:
   application:
     name: api-gateway
 
-  config:
-    import: optional:configserver:http://config-server:8888
-
   cloud:
     compatibility-verifier:
       enabled: false
@@ -19,13 +16,6 @@ spring:
           lower-case-service-id: true
 
       routes:
-        - id: payment-service
-          uri: lb://payment-service
-          predicates:
-            - Path=/api/payments/**
-          filters:
-            - PreserveHostHeader=true
-
         - id: product-service
           uri: lb://product-service
           predicates:
@@ -47,6 +37,20 @@ spring:
           filters:
             - PreserveHostHeader=true
 
+        - id: payment-service
+          uri: lb://payment-service
+          predicates:
+            - Path=/api/payments/**
+          filters:
+            - PreserveHostHeader=true
+
+        - id: batch-service
+          uri: lb://batch-service
+          predicates:
+            - Path=/api/batch/**
+          filters:
+            - PreserveHostHeader=true
+
         - id: notification-service
           uri: lb://notification-service
           predicates:
@@ -61,6 +65,9 @@ spring:
             allowedMethods: "*"
             allowedHeaders: "*"
             allowCredentials: true
+
+  config:
+    import: optional:configserver:http://config-server:8888
 
 eureka:
   client:

@@ -170,7 +170,8 @@ export class SidebarComponent {
     { link: '/app/dashboard', icon: 'dashboard', label: 'Dashboard', roles: ['ADMIN', 'USER'] },
     { link: '/app/products', icon: 'shopping_bag', label: 'Shop', roles: ['ADMIN', 'USER'] },
     { link: '/app/admin/products', icon: 'inventory_2', label: 'Inventory', roles: ['ADMIN'] },
-    { link: '/app/orders', icon: 'view_list', label: 'Orders', roles: ['ADMIN', 'USER'], badge: '3' },
+
+    // Orders link removed as per user request
     { link: '/app/payments', icon: 'payments', label: 'Payments', roles: ['ADMIN', 'USER'] },
     { link: '/app/clients', icon: 'group', label: 'Clients', roles: ['ADMIN'] },
     { link: '/app/settings', icon: 'settings', label: 'Settings', roles: ['ADMIN', 'USER'] },

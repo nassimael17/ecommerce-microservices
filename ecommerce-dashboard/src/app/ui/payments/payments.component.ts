@@ -285,6 +285,10 @@ export class PaymentsComponent {
     return found?.name || 'Unknown Item';
   }
 
+  getOrder(orderId: number): Order | undefined {
+    return this.orders().find(o => o.id === orderId);
+  }
+
   selectedOrderId?: number;
   amount = 0;
   method = 'CARD';
@@ -311,7 +315,8 @@ export class PaymentsComponent {
       // 3. For Client: Filter pending orders for the checkout dropdown
       if (!this.isAdmin()) {
         const uid = this.auth.user()?.id;
-        const pending = orders.filter(o => o.clientId === uid && o.status === 'PENDING');
+        // Allow PENDING and CONFIRMED orders to be paid
+        const pending = orders.filter(o => o.clientId === uid && (o.status === 'PENDING' || o.status === 'CONFIRMED'));
         this.myPendingOrders.set(pending);
       }
     });
@@ -354,6 +359,13 @@ export class PaymentsComponent {
 
   pay() {
     if (!this.selectedOrderId) return;
+
+    // Security check: Ensure amount matches order total exactly
+    const order = this.myPendingOrders().find(o => o.id === this.selectedOrderId);
+    if (!order || this.amount !== order.totalPrice) {
+      this.snack.open('Error: Invalid payment amount.', 'OK');
+      return;
+    }
 
     this.api.create({
       orderId: this.selectedOrderId,

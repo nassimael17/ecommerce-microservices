@@ -1,34 +1,36 @@
-
 // ----------------------------------------------------------------------------
-//  PREMIUM THEME (Glassmorphism & Vibrant Gradients)
+//  PROFESSIONAL TEAL/EMERALD THEME
 // ----------------------------------------------------------------------------
 
 :root {
-  // --- Palettes (OKLCH where supported, else HSL fallback idea) ---
-  --primary-hue: 250;
-  --secondary-hue: 320;
+  // --- Professional Teal/Emerald Palette ---
+  --primary-hue: 174; // Teal
+  --secondary-hue: 187; // Cyan
 
-  --color-primary: oklch(55% 0.22 260);        // Deep Royal Purple / Blue
-  --color-primary-light: oklch(65% 0.18 260);
-  --color-secondary: oklch(60% 0.22 320);      // Vibrant Magenta/Pink
-  
-  --color-accent: oklch(70% 0.2 160);          // Mint/Success
-  --color-danger: oklch(60% 0.2 25);           // Red
+  --color-primary: #14b8a6; // Teal-500
+  --color-primary-light: #2dd4bf; // Teal-400
+  --color-primary-dark: #0d9488; // Teal-600
+  --color-secondary: #06b6d4; // Cyan-500
+  --color-secondary-light: #22d3ee; // Cyan-400
 
-  --color-bg-body: #0f111a;                    // Dark/Deep Navy Background
-  --color-bg-surface: #191c29;
+  --color-accent: #10b981; // Emerald-500 (Success)
+  --color-danger: #ef4444; // Red-500
+
+  --color-bg-body: #0f172a; // Slate-900 (Dark Navy Background)
+  --color-bg-surface: #1e293b; // Slate-800
+  --color-bg-card: #334155; // Slate-700
 
   --color-text-main: #ffffff;
-  --color-text-muted: #94a3b8;
+  --color-text-muted: #94a3b8; // Slate-400
 
-  // --- Glassmorphism ---
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  // --- Glassmorphism with Teal Tint ---
+  --glass-bg: rgba(20, 184, 166, 0.05);
+  --glass-border: rgba(20, 184, 166, 0.2);
+  --glass-shadow: 0 8px 32px 0 rgba(20, 184, 166, 0.15);
   --glass-blur: 12px;
 
   // --- Typography ---
-  --font-heading: 'Outfit', sans-serif;
+  --font-heading: 'Inter', 'Outfit', sans-serif;
   --font-body: 'Inter', sans-serif;
 
   // --- Spacing ---
@@ -49,9 +51,13 @@
 }
 
 @mixin gradient-text {
-  background: linear-gradient(135deg, var(--color-primary-light), var(--color-secondary));
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: transparent;
+}
+
+@mixin gradient-bg {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
 }

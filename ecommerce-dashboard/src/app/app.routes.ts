@@ -21,6 +21,7 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: 'payments', loadComponent: () => import('./ui/payments/payments.component').then(m => m.PaymentsComponent) },
+      { path: 'cart', loadComponent: () => import('./ui/cart/cart.component').then(m => m.CartComponent) },
 
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       { path: 'dashboard', component: DashboardComponent },

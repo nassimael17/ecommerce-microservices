@@ -4,6 +4,7 @@ server:
 spring:
   application:
     name: batch-service
+  
   datasource:
     url: jdbc:postgresql://postgres:5432/ecommerce
     username: postgres
